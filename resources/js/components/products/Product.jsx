@@ -32,7 +32,6 @@ const Product = ({ product, setCart, setIsOpenCart }) => {
                 </button>
             </div>
         </div>
-
     );
 };
 
