@@ -9,12 +9,19 @@ class Cart extends Model
 {
     /** @use HasFactory<\Database\Factories\CartFactory> */
     use HasFactory;
+    protected $guarded = [];
 
     public function user(){
         return $this->belongsTo(User::class);
     }
 
+    public function products(){
+        return $this->belongsToMany(Product::class)
+                ->withPivot('quantity');
+    }
+
     public function product(){
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class)
+                ->withPivot('quantity');
     }
 }

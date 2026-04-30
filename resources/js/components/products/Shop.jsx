@@ -1,9 +1,7 @@
-import React, { createContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BeatLoader from "react-spinners/BeatLoader";
 import ShowProducts from './ShowProducts';
 import Cart from '../cart/Cart';
-
-//export const productsContext = createContext();
 
 const Shop = () => {
     const root = document.getElementById('react-product-user');
@@ -16,6 +14,29 @@ const Shop = () => {
     const [cart, setCart] = useState([]);
     const [isOpenCart, setIsOpenCart] = useState(false);
 
+    // CSRF-Token für fetch-Requests
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    // Cart beim Mount von API laden
+    useEffect(() => {
+        const loadCart = async () => {
+            try {
+                const res = await fetch('/api/cart');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.cart && data.cart.length > 0) {
+                        setCart(data.cart);
+                        setIsOpenCart(true);
+                    }
+                }
+            } catch (err) {
+                console.error('Cart laden fehlgeschlagen:', err);
+            }
+        };
+        loadCart();
+    }, []);
+
+    // Produkte laden
     useEffect(() => {
         const loadProducts = async () => {
             try {
@@ -43,14 +64,26 @@ const Shop = () => {
                     <h1 className="text-3xl font-bold text-gray-300 mb-6 ml-7">{categorieName}</h1>
 
                     {loading && <BeatLoader color="#ffffff" />}
+                    {errorMessage && <p className="text-red-400 ml-7">{errorMessage}</p>}
                     {!loading && products && (
-                        <ShowProducts products={products} setCart={setCart} setIsOpenCart={setIsOpenCart} />
+                        <ShowProducts
+                            products={products}
+                            setCart={setCart}
+                            setIsOpenCart={setIsOpenCart}
+                            csrfToken={csrfToken}
+                        />
                     )}
                 </div>
 
-                {isOpenCart && <Cart cart={cart} setCart={setCart} setIsOpenCart={setIsOpenCart} />}
+                {isOpenCart && (
+                    <Cart
+                        cart={cart}
+                        setCart={setCart}
+                        setIsOpenCart={setIsOpenCart}
+                        csrfToken={csrfToken}
+                    />
+                )}
             </div>
-
         </>
     )
 }

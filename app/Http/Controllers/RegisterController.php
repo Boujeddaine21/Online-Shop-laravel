@@ -22,7 +22,8 @@ class RegisterController extends Controller
         $username = $this->generateUsername($request);
         $attributes['username'] = $username;
         
-        User::create($attributes);
+        $user = User::create($attributes);
+        $user->assignRole('user');
 
         return redirect('/login')->with('success','Great, you can now login');
     }

@@ -1,7 +1,43 @@
 import React from 'react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
-const Product = ({ product, setCart, setIsOpenCart }) => {
+const Product = ({ product, setCart, setIsOpenCart, csrfToken }) => {
+    const addToCart = async () => {
+        try {
+            const res = await fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ product_id: product.id }),
+            });
+
+            if (res.ok) {
+                setCart(prev => {
+                    const existingIndex = prev.findIndex(item => item.id === product.id);
+                    if (existingIndex !== -1) {
+                        return prev.map((item, idx) =>
+                            idx === existingIndex
+                                ? { ...item, cartQty: item.cartQty + 1 }
+                                : item
+                        );
+                    } else {
+                        return [...prev, { ...product, cartQty: 1 }];
+                    }
+                });
+                setIsOpenCart(true);
+                toast.success('Product added to your Cart');
+            } else {
+                const data = await res.json();
+                toast.error(data.error || 'Fehler beim Hinzufügen');
+            }
+        } catch (err) {
+            toast.error('Netzwerkfehler');
+        }
+    };
+
     return (
         <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300
                 p-4 cursor-pointer transform hover:-translate-y-1 w-full max-w-[220px] flex flex-col">
@@ -23,12 +59,11 @@ const Product = ({ product, setCart, setIsOpenCart }) => {
                 <span className="text-lg font-bold text-teal-600 mt-3">
                     {product.price} €
                 </span>
-                <button className="mt-2 w-full bg-teal-600 hover:bg-teal-700 text-white py-1.5 text-sm rounded-md font-medium transition"
-                    onClick={() => {
-                        toast.success('Product added to your Cart');
-                        setCart(prev => [...prev, {...product, cartQty: 1}]);
-                        setIsOpenCart(true)
-                    }}>Add to Cart
+                <button
+                    className="mt-2 w-full bg-teal-600 hover:bg-teal-700 text-white py-1.5 text-sm rounded-md font-medium transition hover:cursor-pointer"
+                    onClick={addToCart}
+                >
+                    Add to Cart
                 </button>
             </div>
         </div>

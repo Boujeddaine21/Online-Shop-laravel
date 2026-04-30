@@ -9,6 +9,7 @@ class Order extends Model
 {
     /** @use HasFactory<\Database\Factories\OrderFactory> */
     use HasFactory;
+    protected $guarded = [];
 
     public function user(){
         return $this->belongsTo(User::class);

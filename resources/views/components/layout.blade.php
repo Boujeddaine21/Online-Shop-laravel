@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>OnlineShop</title>
@@ -34,20 +35,24 @@
                     @endrole
                     @role('user')
                         <a href="/shop" class="hover:underline">Shop</a>
+                        <a href="/my-orders" class="hover:underline">My Orders</a>
                     @endrole
-                    <a href="" class="hover:underline">About</a>
-                    <a href="" class="hover:underline">Contact</a>
+                    <a href="/about" class="hover:underline">About</a>
+                    <a href="/contact" class="hover:underline">Contact</a>
                 </div>
             </div>
 
             <div class="flex justify-end items-center gap-4">
-                <div><a href="" class="hover:underline">Cart</a></div>
+                @role('user')
+                    <div><a href="/shop" class="hover:underline">🛒 Cart</a></div>
+                @endrole
                 <div class="flex gap-4">
                     @guest
                         <a href="/login" class="hover:underline">Login</a>
                         <a href="/register" class="hover:underline">Register</a>
                     @endguest
                     @auth
+                        <span class="text-gray-300 text-sm">{{ Auth::user()->firstname }}</span>
                         <form action="/logout" method="POST">
                             @csrf
                             <button class="hover:underline hover:cursor-pointer">Logout</button>
@@ -63,6 +68,7 @@
             <div class="mb-10">@yield('create-product')</div>
             <div class="mb-10">@yield('dashboard')</div>
             <div class="mb-10">@yield('categories')</div>
+            <div class="mb-10">@yield('content')</div>
 
             <main class="mb-10">
                 @yield('admin-all-products')
