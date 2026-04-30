@@ -120,6 +120,10 @@ class CartController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|string|in:paypal,creditcard,bank_transfer',
+            'shipping_street' => 'required|string|max:255',
+            'shipping_city' => 'required|string|max:255',
+            'shipping_zip' => 'required|string|max:20',
+            'shipping_country' => 'required|string|max:100',
         ]);
 
         $user = Auth::user();
@@ -153,6 +157,10 @@ class CartController extends Controller
                 'total' => $orderTotal,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
+                'shipping_street' => $request->shipping_street,
+                'shipping_city' => $request->shipping_city,
+                'shipping_zip' => $request->shipping_zip,
+                'shipping_country' => $request->shipping_country,
             ]);
 
             // Order-Products hinzufügen + Lagerbestand reduzieren
